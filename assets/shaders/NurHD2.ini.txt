@@ -1,0 +1,6 @@
+[Sugoi Color HD V2]
+Name=Sugoi Color HD V2
+Author=Nur
+Fragment=NurHD2.fsh
+Vertex=NurHD2.vsh
+OutputResolution=True

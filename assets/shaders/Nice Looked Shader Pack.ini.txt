@@ -1,0 +1,9 @@
+# This shader pick and customized by me
+get the ready to edited shader in http://arashi-go.blogspot.ae/2016/02/ppsspp-shaders.html
+
+[Nice look Android]
+Name=Nice look Low
+Author=Nice look Android
+Fragment=Nice Look Android.fsh
+Vertex=Vertex.vsh
+OutputResolution=True

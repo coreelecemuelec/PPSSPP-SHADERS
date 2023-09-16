@@ -1,0 +1,6 @@
+[4K SweetFX]
+Name=4K SweetFX
+Author=YG
+Fragment=YG.fsh
+Vertex=YG.vsh
+OutputResolution=True
