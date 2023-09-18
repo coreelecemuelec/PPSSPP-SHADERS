@@ -1,3 +1,7 @@
+COMANDO CRIAR BACKUP  git switch -c "BANCO DE DADOS"
+                      
+
+
 PPSSPP - a fast and portable PSP emulator
 =========================================
 
