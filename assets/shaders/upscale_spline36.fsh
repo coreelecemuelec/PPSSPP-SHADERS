@@ -1,120 +1,72 @@
-// Spline36 upscaling shader.
-// See issue #3921
+//===========================//
+//edit angka yang ada dibawah ini untuk mengatur tampilan
 
+#define warna 1.3 //normal: 1.0 
+#define cerah 1.3 //normal: 1.0
+#define kontras 1.2 //normal: 1.0
+
+#define kemerahan 1.0 //normal: 1.0
+#define kehijauan 1.0 //normal: 1.0
+#define kebiruan 1.0 //normal: 1.0
+
+//semakin tinggi angka depan yang dirubah, maka akan semakin ngaco ^,^
+//===========================//
+
+
+
+//FB: Muhammad Nur Al-Mahabbah
+
+
+
+///////////////////////////////////
+//dibawah ini tidak boleh di edit//
+///////////////////////////////////
+#define sugoicolor 1
 #ifdef GL_ES
 precision mediump float;
 precision mediump int;
 #endif
 
 uniform sampler2D sampler0;
-varying vec2 v_position;
+uniform vec4 u_time;
 
 uniform vec2 u_texelDelta;
 uniform vec2 u_pixelDelta;
+varying vec2 v_texcoord0;
 
-const vec2 HALF_PIXEL = vec2(0.5, 0.5);
-
-float spline36_0_1(float x) {
-	return ((13.0 / 11.0 * x - 453.0 / 209.0) * x - 3.0 / 209.0) * x + 1.0;
-}
-
-float spline36_1_2(float x) {
-	return ((-6.0 / 11.0 * x + 612.0 / 209.0) * x - 1038.0 / 209.0) * x + 540.0 / 209.0;
-}
-
-float spline36_2_3(float x) {
-	return ((1.0 / 11.0 * x - 159.0 / 209.0) * x + 434.0 / 209.0) * x - 384.0 / 209.0;
-}
-
-vec4 rgb(int inputX, int inputY) {
-	return texture2D(sampler0, (vec2(inputX, inputY) + HALF_PIXEL) * u_texelDelta);
-}
-
-vec4 interpolateHorizontally(vec2 inputPos, ivec2 inputPosFloor, int dy) {
-	float sumOfWeights = 0.0;
-	vec4 sumOfWeightedPixel = vec4(0.0);
-
-	float x;
-	float weight;
-
-	x = inputPos.x - float(inputPosFloor.x - 2);
-	weight = spline36_2_3(x);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * rgb(inputPosFloor.x - 2, inputPosFloor.y + dy);
-
-	--x;
-	weight = spline36_1_2(x);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * rgb(inputPosFloor.x - 1, inputPosFloor.y + dy);
-
-	--x;
-	weight = spline36_0_1(x);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * rgb(inputPosFloor.x + 0, inputPosFloor.y + dy);
-
-	x = 1.0 - x;
-	weight = spline36_0_1(x);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * rgb(inputPosFloor.x + 1, inputPosFloor.y + dy);
-
-	++x;
-	weight = spline36_1_2(x);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * rgb(inputPosFloor.x + 2, inputPosFloor.y + dy);
-
-	++x;
-	weight = spline36_2_3(x);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * rgb(inputPosFloor.x + 3, inputPosFloor.y + dy);
-
-	return sumOfWeightedPixel / sumOfWeights;
-}
-
-vec4 process(vec2 outputPos) {
-	vec2 inputPos = outputPos / u_texelDelta;
-	ivec2 inputPosFloor = ivec2(inputPos);
-
-	// Vertical interporation
-	float sumOfWeights = 0.0;
-	vec4 sumOfWeightedPixel = vec4(0.0);
-
-	float weight;
-	float y;
-
-	y = inputPos.y - float(inputPosFloor.y - 2);
-	weight = spline36_2_3(y);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * interpolateHorizontally(inputPos, inputPosFloor, -2);
-
-	--y;
-	weight = spline36_1_2(y);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * interpolateHorizontally(inputPos, inputPosFloor, -1);
-
-	--y;
-	weight = spline36_0_1(y);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * interpolateHorizontally(inputPos, inputPosFloor, +0);
-
-	y = 1.0 - y;
-	weight = spline36_0_1(y);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * interpolateHorizontally(inputPos, inputPosFloor, +1);
-
-	++y;
-	weight = spline36_1_2(y);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * interpolateHorizontally(inputPos, inputPosFloor, +2);
-
-	++y;
-	weight = spline36_2_3(y);
-	sumOfWeights += weight;
-	sumOfWeightedPixel += weight * interpolateHorizontally(inputPos, inputPosFloor, +3);
-
-	return vec4((sumOfWeightedPixel / sumOfWeights).xyz, 1.0);
-}
+float overlay(float base, float blend)
+{float result = 0.0;
+if( base < 0.5 )
+result = 2.0 * base * blend;
+else
+result = 1.0 - (1.0 - 2.0*(base-0.5)) * (1.0-blend);
+return result;}
 
 void main()
-{
-  gl_FragColor.rgba = process(v_position);
-}
+{vec3 color = texture2D(sampler0, v_texcoord0.xy).xyz;
+#if(sugoicolor==1)
+
+float sat = warna;
+float brt = cerah;
+float con = kontras;
+
+float AvgLumR = kemerahan;
+float AvgLumG = kehijauan;
+float AvgLumB = kebiruan;
+
+const vec3 LumCoeff = vec3(0.2125, 0.7154, 0.0721);
+
+vec3 AvgLumin = vec3(AvgLumR, AvgLumG, AvgLumB);
+vec3 conRGB = vec3(0.5, 0.5, 0.5);
+vec3 brtColor = color.rgb * brt;
+vec3 intensity = vec3((brtColor.r*LumCoeff.r)+(brtColor.g*LumCoeff.g)+(brtColor.b*LumCoeff.b));
+vec3 satColor = mix(intensity, brtColor, sat);
+vec3 conColor = mix(conRGB, satColor, con);
+vec3 mixColor = AvgLumin * conColor;
+
+color.rgb = mixColor;
+
+#endif
+
+gl_FragColor.xyz=color;
+gl_FragColor.a = 1.0;}

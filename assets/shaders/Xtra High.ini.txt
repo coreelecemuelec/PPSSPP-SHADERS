@@ -1,0 +1,6 @@
+[Xtra High]
+Name=Xtra High
+Author=YG
+Fragment=Xtra High.fsh
+Vertex=Xtra High.vsh
+OutputResolution=True
