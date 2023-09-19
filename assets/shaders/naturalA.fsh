@@ -1,6 +1,6 @@
-// Natural Vision Shader, modified to use in PPSSPP.
+// Natural Vision Shader with removed blur.
 
-// by ShadX (Modded by SimoneT)
+// by ShadX (Modded by SimoneT and Leopard20)
 // http://forums.ngemu.com/showthread.php?t=76098
 
 #ifdef GL_ES
@@ -9,7 +9,10 @@ precision mediump int;
 #endif
 
 uniform sampler2D sampler0;
-varying vec2 v_texcoord0;
+varying vec4 v_texcoord0;
+varying vec4 v_texcoord1;
+varying vec4 v_texcoord2;
+varying vec4 v_texcoord3;
 
 const mat3 RGBtoYIQ = mat3(0.299, 0.596, 0.212, 
                            0.587,-0.275,-0.523, 
@@ -25,7 +28,7 @@ void main()
 {
 vec3 c0,c1;
 
-c0 = texture2D(sampler0,v_texcoord0).xyz;
+c0 = texture2D(sampler0,v_texcoord0.xy).xyz;
 
 c1=RGBtoYIQ*c0;
 
